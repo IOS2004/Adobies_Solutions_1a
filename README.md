@@ -4,16 +4,16 @@ A machine learning-based solution for extracting structured outlines from PDF do
 
 ## Overview
 
-This project is part of the "Connecting the Dots" Challenge Round 1A, focusing on understanding document structure through intelligent PDF analysis. The solution uses LightGBM models to classify text blocks and determine heading hierarchies with high accuracy and speed.
+This project is part of the "Connecting the Dots" Challenge Round 1A, focusing on understanding document structure through intelligent PDF analysis. The solution uses LightGBM models to classify text blocks and determine heading hierarchies.
 
 ## Features
 
 - **Title Extraction**: Automatically identifies and extracts document titles
 - **Hierarchical Heading Detection**: Classifies headings into H1, H2, H3 levels
 - **Page Number Tracking**: Associates each heading with its page location
-- **High Performance**: Processes 50-page PDFs in under 10 seconds
+- **High Performance**: Processes PDFs in under 10 seconds
 - **Offline Operation**: Works completely offline without internet connectivity
-- **Multi-language Support**: Handles various document formats and languages
+- **Docker Deployment**: Containerized for consistent cross-platform execution
 
 ## Architecture
 
@@ -23,7 +23,7 @@ The solution consists of two main components:
 
 - Classifies text blocks into categories: Title, Heading, or Other
 - Uses features: font size, bold formatting, indentation, page number
-- Trained using LightGBM for fast inference
+- Trained using synthetic data based on common PDF patterns
 
 ### 2. Level Classification Model (`level_model.lgb`)
 
@@ -46,79 +46,50 @@ The solution consists of two main components:
 ├── src/
 │   ├── main.py           # Main application entry point
 │   └── extractor.py      # PDF extraction and processing logic
-├── models/
-│   ├── block_model.lgb   # Block classification model
-│   ├── level_model.lgb   # Heading level classification model
-│   ├── block_label_encoder.joblib  # Block label encoder
-│   └── level_label_encoder.joblib  # Level label encoder
-├── input/                # Input PDF files directory
+├── input/                # Input PDF files directory (5 sample PDFs)
 ├── output/              # Output JSON files directory
-├── sample/              # Sample data and reference outputs
-├── Dockerfile           # Container configuration
-├── .dockerignore        # Docker build exclusions
-├── requirements.txt     # Python dependencies
-├── build_and_run.sh     # Linux/macOS build script
-├── build_and_run.bat    # Windows build script
-├── validate_output.py   # Output validation script
-└── README.md           # This file
+├── sample/              # Sample data and reference implementation
+├── block_model.lgb      # Block classification model (292KB)
+├── level_model.lgb      # Heading level classification model (225KB)
+├── block_label_encoder.joblib  # Block label encoder
+├── level_label_encoder.joblib  # Level label encoder
+├── train_models.py      # Model training script
+├── Dockerfile          # Container configuration
+├── requirements.txt    # Python dependencies
+├── validate_output.py  # Output validation script
+├── specifications.txt  # Project requirements
+└── README.md          # This file
 ```
 
 ## Installation & Usage
 
-### Quick Start (Recommended)
-
-For easy deployment, use the provided build scripts:
-
-**Linux/macOS:**
-
-```bash
-chmod +x build_and_run.sh
-./build_and_run.sh
-```
-
-**Windows:**
-
-```cmd
-build_and_run.bat
-```
-
-These scripts will automatically:
-
-1. Build the Docker image
-2. Create input/output directories if needed
-3. Validate that PDF files exist in the input directory
-4. Run the extraction process
-5. Report results
-
-### Manual Docker Deployment
+### Quick Start with Docker (Recommended)
 
 1. **Build the Docker image:**
-
    ```bash
-   docker build --platform linux/amd64 -t pdf-extractor:latest .
+   docker build -t pdf-extractor .
    ```
 
 2. **Run the container:**
    ```bash
-   docker run --rm \
-     -v $(pwd)/input:/app/input \
-     -v $(pwd)/output:/app/output \
-     --network none \
-     pdf-extractor:latest
+   docker run --rm -v "$(pwd)/input:/app/input" -v "$(pwd)/output:/app/output" pdf-extractor
+   ```
+
+   **Windows PowerShell:**
+   ```powershell
+   docker run --rm -v "${PWD}\input:/app/input" -v "${PWD}\output:/app/output" pdf-extractor
    ```
 
 ### Local Development
 
 1. **Install dependencies:**
-
    ```bash
    pip install -r requirements.txt
    ```
 
 2. **Train models (if needed):**
-
    ```bash
-   python train_model.py
+   python train_models.py
    ```
 
 3. **Run extraction:**
@@ -128,19 +99,10 @@ These scripts will automatically:
 
 ### Output Validation
 
-Validate the generated JSON outputs against the expected schema:
-
+Validate the generated JSON outputs:
 ```bash
 python validate_output.py
 ```
-
-This will check all JSON files in the output directory for:
-
-- Correct JSON format
-- Required fields (title, outline)
-- Proper data types
-- Valid heading levels (H1, H2, H3)
-- Positive page numbers
 
 ## Input/Output Format
 
@@ -195,10 +157,10 @@ The solution extracts four key features from PDF text spans:
 
 ### Model Training
 
-- Uses labeled training data with ground truth annotations
+- Uses synthetic training data based on common PDF patterns
 - LightGBM classifiers for fast, accurate predictions
 - Label encoders for categorical target variables
-- Cross-validation for robust performance
+- Heuristic-based feature generation for robust performance
 
 ## Performance Specifications
 
@@ -226,64 +188,47 @@ The solution extracts four key features from PDF text spans:
 
 7. **Validation Tools**: Built-in validation ensures output quality and format compliance.
 
-## Recent Improvements
+## Current Status
 
-### Code Quality
+### ✅ Working Features
+- Docker containerization with proper dependencies
+- PDF text extraction and feature engineering
+- Two-stage ML classification (block type and heading level)
+- JSON output generation with valid schema
+- Offline processing (no network required)
+- Model files under 200MB size constraint
 
-- ✅ Enhanced error handling and logging in main.py
-- ✅ Fixed variable naming consistency in extractor.py
-- ✅ Added UTF-8 encoding support for international characters
-- ✅ Improved Docker build optimization with better layer caching
+### 🔧 Areas for Improvement
+- Model accuracy could be enhanced with real training data
+- Title extraction needs refinement
+- Heading level classification requires tuning
+- Some duplicate headings in output need filtering
 
-### Deployment
-
-- ✅ Added .dockerignore for faster, cleaner builds
-- ✅ Created cross-platform build scripts (Linux/Windows)
-- ✅ Added comprehensive output validation script
-- ✅ Enhanced Dockerfile with system dependencies and environment variables
-
-### Documentation
-
-- ✅ Comprehensive README with clear setup instructions
-- ✅ Detailed API documentation and usage examples
-- ✅ Performance specifications and architecture overview
-- ✅ Troubleshooting and validation guidance
+### Recent Improvements
+- ✅ Fixed LightGBM dependency issues (`libgomp1`)
+- ✅ Created working model files using synthetic training data
+- ✅ Successful Docker deployment and testing
+- ✅ All output files pass validation checks
 
 ## Limitations & Future Improvements
 
 ### Current Limitations
-
+- Models trained on synthetic data rather than real PDF annotations
 - Limited to H1, H2, H3 heading levels
-- Requires training data for optimal performance
-- May struggle with highly non-standard PDF layouts
+- May produce duplicate headings or misclassified levels
+- Title extraction sometimes picks generic headers
 
 ### Potential Enhancements
-
+- Train models on manually labeled PDF data for better accuracy
+- Implement post-processing to filter duplicate headings
+- Add confidence scoring for predictions
 - Support for additional heading levels (H4, H5, H6)
-- Enhanced multilingual support
-- Table of contents generation
-- Integration with semantic search capabilities
+- Enhanced title detection with document context
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+This project was developed for the "Connecting the Dots" Challenge Round 1A.
 
 ## License
 
-This project is part of the "Connecting the Dots" Challenge and follows the competition guidelines.
-
-## Support
-
-For questions or issues:
-
-- Check the sample data in the `sample/` directory
-- Review the specifications in `specifications.txt`
-- Examine test cases in the `test_*` files
-
----
-
-_Built for the "Connecting the Dots" Challenge - Rethinking how we read, understand, and connect with documents._
+This project follows the competition guidelines for the "Connecting the Dots" Challenge.
