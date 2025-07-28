@@ -1,5 +1,6 @@
-pdfplumber==0.11.1
+PyMuPDF==1.24.1
 lightgbm==4.3.0
 scikit-learn==1.5.0
 pandas==2.2.2
 thefuzz==0.22.1
+joblib==1.4.2
