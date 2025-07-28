@@ -66,16 +66,19 @@ The solution consists of two main components:
 ### Quick Start with Docker (Recommended)
 
 1. **Build the Docker image:**
+
    ```bash
    docker build -t pdf-extractor .
    ```
 
 2. **Run the container:**
+
    ```bash
    docker run --rm -v "$(pwd)/input:/app/input" -v "$(pwd)/output:/app/output" pdf-extractor
    ```
 
    **Windows PowerShell:**
+
    ```powershell
    docker run --rm -v "${PWD}\input:/app/input" -v "${PWD}\output:/app/output" pdf-extractor
    ```
@@ -83,11 +86,13 @@ The solution consists of two main components:
 ### Local Development
 
 1. **Install dependencies:**
+
    ```bash
    pip install -r requirements.txt
    ```
 
 2. **Train models (if needed):**
+
    ```bash
    python train_models.py
    ```
@@ -100,6 +105,7 @@ The solution consists of two main components:
 ### Output Validation
 
 Validate the generated JSON outputs:
+
 ```bash
 python validate_output.py
 ```
@@ -191,6 +197,7 @@ The solution extracts four key features from PDF text spans:
 ## Current Status
 
 ### ✅ Working Features
+
 - Docker containerization with proper dependencies
 - PDF text extraction and feature engineering
 - Two-stage ML classification (block type and heading level)
@@ -199,12 +206,14 @@ The solution extracts four key features from PDF text spans:
 - Model files under 200MB size constraint
 
 ### 🔧 Areas for Improvement
+
 - Model accuracy could be enhanced with real training data
 - Title extraction needs refinement
 - Heading level classification requires tuning
 - Some duplicate headings in output need filtering
 
 ### Recent Improvements
+
 - ✅ Fixed LightGBM dependency issues (`libgomp1`)
 - ✅ Created working model files using synthetic training data
 - ✅ Successful Docker deployment and testing
@@ -213,12 +222,14 @@ The solution extracts four key features from PDF text spans:
 ## Limitations & Future Improvements
 
 ### Current Limitations
+
 - Models trained on synthetic data rather than real PDF annotations
 - Limited to H1, H2, H3 heading levels
 - May produce duplicate headings or misclassified levels
 - Title extraction sometimes picks generic headers
 
 ### Potential Enhancements
+
 - Train models on manually labeled PDF data for better accuracy
 - Implement post-processing to filter duplicate headings
 - Add confidence scoring for predictions
